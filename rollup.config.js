@@ -1,3 +1,9 @@
+/**
+ * Created by prefrence on 2021/02/09
+ * @file core
+ * @author white_g <mganxiaolei@gmail.com>
+ */
+
 import json from 'rollup-plugin-json';
 import {terser} from 'rollup-plugin-terser';
 import commonjs from 'rollup-plugin-commonjs';

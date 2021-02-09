@@ -4,21 +4,36 @@
  * @author white_g <mganxiaolei@gmail.com>
  */
 
+ import isType from './../utils/type';
+
 class DataAdapter {
   constructor(data) {
     this.data = data;
   }
 
-  transData(data, computes = []) {
+  transData(originData, computes = []) {
     if (computes.length === 0) {
-      return data;
+      return originData;
     }
     const compute = computes.shift();
     const computeArr = compute.split(':');
-    let result = data;
+    let data = originData;
+    let result = originData;
     const handleFunc = DataAdapter.filterMap[computeArr[0]];
-    if (handleFunc) {
+    const dataType = isType(data);
+    let newData = data;
+    // 引用类型数据处理使用copy数据，防止串改原数据
+    if (dataType === 'object') {
+      data = { ...originData };
+    }
+    if (dataType === 'array') {
+      data = [...originData];
+    }
+    if (handleFunc && isType(handleFunc) === 'function') {
       result = handleFunc(data);
+    } else if (handleFunc && isType(handleFunc) === 'object') {
+      const typeHandleFunc = handleFunc[dataType];
+      result = typeHandleFunc ? typeHandleFunc(data) : data;
     }
     return this.transData(result, computes);
   }
@@ -40,7 +55,7 @@ class DataAdapter {
 
     return opt.reduce((prevData, item) => {
       const arr = item.split('|');
-      key = arr.shift();
+      const key = arr.shift();
       if (prevData && prevData[key]) {
         return this.transData(prevData[key], arr);
       }
@@ -52,10 +67,16 @@ class DataAdapter {
   static addFilter(name, func) {
     let filterName = name;
     let filterHandle = func;
-    if ((typeof name).toLocaleLowerCase() !== 'string') {
+
+    if (isType(name) !== 'string') {
       filterHandle = name;
-      filterName = func.filterName;
+      filterName = name.filterName;
     }
+
+    if (isType(filterHandle) !== 'function' && isType(filterHandle) !== 'object') {
+      throw new Error('参数错误')
+    }
+
     if (DataAdapter.filterMap[filterName]) {
       throw new Error('存在重复的过滤器名称');
     }
@@ -65,5 +86,11 @@ class DataAdapter {
 
 DataAdapter.filterMap = {};
 
-export default DataAdapter;
+function creator(data) {
+  return new DataAdapter(data);
+};
+
+creator.addFilter = DataAdapter.addFilter;
+
+export default creator;
 
