@@ -1,10 +1,7 @@
-function reverseFilterHandle() {
-  if (Array.isArray(res)) {
-    return res.reverse();
-  }
-  return res;
+function reverseFilterHandle(res) {
+  return res.reverse();
 }
-
-reverseFilterHandle.filterName = 'reverse';
-
-export default reverseFilterHandle;
+export default {
+  array: reverseFilterHandle,
+  filterName: 'reverse',
+};
