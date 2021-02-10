@@ -53,14 +53,32 @@ class DataAdapter {
       return result;
     }
 
-    return opt.reduce((prevData, item) => {
+    let count = 0;
+    let prevData = this.data;
+    while (opt.length > count) {
+      const item = opt[count];
+      count += 1;
+
       const arr = item.split('|');
       const key = arr.shift();
-      if (prevData && prevData[key]) {
-        return this.transData(prevData[key], arr);
+
+      if (key === '$') {
+        if (isType(prevData) === 'array') {
+          return prevData.map(item => {
+            return new DataAdapter(item).get(opt.slice(count));
+          });
+        }
+        return defaultValue;
       }
-      return defaultValue;
-    }, this.data);
+
+      if (prevData && prevData[key]) {
+        prevData = this.transData(prevData[key], arr);
+      } else {
+        prevData = defaultValue;
+      }
+    }
+
+    return prevData;
   }
 
   // 新增过滤器
