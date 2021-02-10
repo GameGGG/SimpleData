@@ -65,7 +65,7 @@ class DataAdapter {
       if (key === '$') {
         if (isType(prevData) === 'array') {
           return prevData.map(item => {
-            return new DataAdapter(item).get(opt.slice(count));
+            return new DataAdapter(item).get(opt.slice(count), defaultValue);
           });
         }
         return defaultValue;
@@ -92,7 +92,11 @@ class DataAdapter {
     }
 
     if (isType(filterHandle) !== 'function' && isType(filterHandle) !== 'object') {
-      throw new Error('参数错误')
+      throw new Error('参数错误');
+    }
+
+    if (!filterName) {
+      throw new Error('缺少过滤器名称');
     }
 
     if (DataAdapter.filterMap[filterName]) {
