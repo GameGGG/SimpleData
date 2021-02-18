@@ -1,6 +1,6 @@
 {
-  "name": "zw-data-adapter",
-  "version": "1.0.1",
+  "name": "zw-simple-data",
+  "version": "1.0.0",
   "description": "用于前端深层次数据获取和数据处理",
   "main": "build/index.js",
   "scripts": {
